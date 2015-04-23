@@ -44,6 +44,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WavWriter.cs" />
     <Compile Include="XiInstrument.cs" />
     <Compile Include="XiSample.cs" />
   </ItemGroup>
