@@ -12,21 +12,19 @@ namespace Xi2Wav
         static void Main(string[] args)
         {
             var xiPath = args[0];
-            using (var filestream = new FileStream(xiPath, FileMode.Open))
+            var wavPath = Path.GetFileNameWithoutExtension(xiPath) + ".wav";
+            using (var instream = new FileStream(xiPath, FileMode.Open))
+            using (var outstream = new FileStream(wavPath, FileMode.Create))
             {
-                var instrument = new XiInstrument(filestream);
+                var instrument = new XiInstrument(instream);
+                if (instrument.Samples.Count == 0)
+                    throw new Exception("Instrument has no samples");
                 if (instrument.Samples.Count > 1)
                     throw new Exception("Multi-samples not yet supported");
-                if (!instrument.Samples.First().Is16Bit)
-                    throw new Exception("8 bit samples not supported");
-
-                var wavPath = Path.GetFileNameWithoutExtension(xiPath) + ".wav";
+                if (instrument.Samples.Any(s => !s.Is16Bit))
+                    throw new Exception("8 bit samples not yet supported");
                 var channels = instrument.Samples.Select(s => s.PcmData).ToList();
-
-                using (var outstream = new FileStream(wavPath, FileMode.Create))
-                {
-                    WavWriter.Write(outstream, 22050, 16, channels);
-                }
+                WavWriter.Write(outstream, 44100, 16, channels);
             }
         }
     }
