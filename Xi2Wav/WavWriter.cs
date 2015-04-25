@@ -54,7 +54,7 @@ namespace Xi2Wav
                 {
                     foreach (var channel in channels)
                     {
-                        br.Write(channel.Skip(offset).Take(bytesPerSample).ToArray());
+                        br.Write(channel, offset, bytesPerSample);
                     }
                 }
             }
