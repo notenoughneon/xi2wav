@@ -60,7 +60,17 @@ namespace Xi2Wav
                     throw new Exception("Multi-samples not yet supported");
                 if (instrument.Samples.Any(s => !s.Is16Bit))
                     throw new Exception("8 bit samples not yet supported");
-                var channels = instrument.Samples.Select(s => s.PcmData).ToList();
+                // convert dpcm to pcm
+                foreach (var sample in instrument.Samples)
+                {
+                    Int16 last = 0;
+                    for (var i = 0; i < sample.DpcmData.Length; i += 2)
+                    {
+                        last += BitConverter.ToInt16(sample.DpcmData, i);
+                        Array.Copy(BitConverter.GetBytes(last), 0, sample.DpcmData, i, 2);
+                    }
+                }
+                var channels = instrument.Samples.Select(s => s.DpcmData).ToList();
                 WavWriter.Write(outstream, 44100, 16, channels);
             }
         }

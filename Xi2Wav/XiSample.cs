@@ -30,7 +30,7 @@ namespace Xi2Wav
         public bool Is16Bit { get { return (Flags & FLAG_16BIT) != 0; } }
         public bool IsStereo { get { return (Flags & FLAG_STEREO) != 0; } }
 
-        public byte[] PcmData;
+        public byte[] DpcmData;
 
         internal XiSample(Stream stream)
         {
@@ -51,13 +51,13 @@ namespace Xi2Wav
 
         internal void LoadData(Stream stream)
         {
-            PcmData = new byte[Length];
+            DpcmData = new byte[Length];
             int offset = 0;
             int length = (int) Length;
             var read = 0;
             do
             {
-                read = stream.Read(PcmData, offset, length - offset);
+                read = stream.Read(DpcmData, offset, length - offset);
                 offset += read;
             }
             while (read > 0 && (length - offset) > 0);
