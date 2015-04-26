@@ -11,13 +11,13 @@ namespace Xi2Wav
     {
         public const UInt16 FORMAT_PCM = 0x0001;
 
-        public static void Write(Stream stream, int rate, int bits, List<byte[]> channels)
+        public static void Write(Stream stream, int rate, int bits, byte[][] channels)
         {
-            if (channels.Count == 0)
-                throw new InvalidDataException();
+            if (channels.Length == 0)
+                throw new InvalidDataException("Must have at least one channel");
             var length = channels.First().Length;
             if (channels.Skip(1).Any(c => c.Length != length))
-                throw new InvalidDataException();
+                throw new InvalidDataException("Channel lengths must not differ");
 
             using (var br = new BinaryWriter(stream, Encoding.Default))
             {
@@ -25,7 +25,7 @@ namespace Xi2Wav
                 UInt32 fmtChunkSize = 16;
                 UInt32 chunkSize = 4 + 8 + fmtChunkSize + 8 + dataChunkSize;
 
-                UInt16 numChannels = (UInt16)channels.Count;
+                UInt16 numChannels = (UInt16)channels.Length;
                 UInt32 sampleRate = (UInt32)rate;
                 UInt16 bitsPerSample = (UInt16)bits;
                 UInt32 byteRate = (UInt32)(sampleRate * numChannels * (bitsPerSample / 8));

@@ -28,7 +28,14 @@ namespace Xi2Wav
                     if (parms.Length >= 2)
                         wavPath = parms[1] + Path.DirectorySeparatorChar + wavPath;
                     Directory.CreateDirectory(Path.GetDirectoryName(wavPath));
-                    Convert(xiPath, wavPath);
+                    try
+                    {
+                        Convert(xiPath, wavPath);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: {0}", e.Message);
+                    }
                 }
             }
             else if (switches.Length == 0 && parms.Length > 0)
@@ -70,7 +77,23 @@ namespace Xi2Wav
                         Array.Copy(BitConverter.GetBytes(last), 0, sample.DpcmData, i, 2);
                     }
                 }
-                var channels = instrument.Samples.Select(s => s.DpcmData).ToList();
+                var channels = instrument.Samples.Select(s => s.DpcmData).ToArray();
+                // normalize stereo samples of different length
+                if (channels.Length > 1 && channels[0].Length != channels[1].Length)
+                {
+                    var left = channels[0];
+                    var right = channels[1];
+                    if (left.Length > right.Length)
+                    {
+                        channels[1] = new byte[left.Length];
+                        Array.Copy(right, channels[1], right.Length);
+                    }
+                    else
+                    {
+                        channels[0] = new byte[right.Length];
+                        Array.Copy(left, channels[0], left.Length);
+                    }
+                }
                 WavWriter.Write(outstream, 44100, 16, channels);
             }
         }
