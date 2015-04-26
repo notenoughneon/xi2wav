@@ -21,7 +21,7 @@ namespace Xi2Wav
 
             using (var br = new BinaryWriter(stream, Encoding.Default))
             {
-                UInt32 dataChunkSize = (UInt32) channels.Sum(c => c.Length) + 4;
+                UInt32 dataChunkSize = (UInt32) channels.Sum(c => c.Length);
                 UInt32 fmtChunkSize = 16;
                 UInt32 chunkSize = 4 + 8 + fmtChunkSize + 8 + dataChunkSize;
 
